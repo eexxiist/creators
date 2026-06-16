@@ -6,9 +6,12 @@ import {
   Body,
   BadRequestException,
   Headers,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { RegistrationDto } from './dto/registration.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -30,16 +33,9 @@ export class AuthController {
   }
 
   @Get('profile')
-  async profile(@Headers() headers: Record<string, string>) {
-    const authorization = headers.authorization;
-
-    if (!authorization) {
-      throw new BadRequestException('Токен не найден');
-    }
-
-    const token = authorization.split(' ')[1];
-    console.log('authorization:', authorization);
-    console.log('token:', token);
-    return this.authService.profile(token);
+  @UseGuards(AuthGuard)
+  async profile(@Req() request: any) {
+    let userId = request.user.id;
+    return this.authService.profile(userId);
   }
 }
