@@ -12,6 +12,7 @@ async function bootstrap() {
     .setTitle('Chefs API')
     .setDescription('API для приложения рецептов')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
