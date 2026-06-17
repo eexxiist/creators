@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  Param,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -41,5 +40,48 @@ export class CategoryService {
 
     const category = await this.prisma.category.create({ data: { name } });
     return category;
+  }
+
+  async delete(id: string) {
+    const findCategory = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!findCategory) {
+      throw new NotFoundException('Категории не существует');
+    }
+
+    await this.prisma.category.delete({
+      where: { id },
+    });
+
+    return {
+      message: 'Категория удалена',
+    };
+  }
+
+  async update(id: string, data: CreateCategoryDto) {
+    const { name } = data;
+    const searchCategory = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!searchCategory) {
+      throw new NotFoundException('Категории не существует');
+    }
+
+    const findCategory = await this.prisma.category.findUnique({
+      where: { name },
+    });
+
+    if (findCategory && findCategory.id !== id) {
+      throw new ConflictException('Имя занято');
+    }
+
+    const updateCategory = await this.prisma.category.update({
+      where: { id },
+      data: { name },
+    });
+    return updateCategory;
   }
 }

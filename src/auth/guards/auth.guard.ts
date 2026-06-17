@@ -20,7 +20,9 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = verifyToken(token);
+
       request.user = payload;
+
       return true;
     } catch (error) {
       throw new UnauthorizedException();
