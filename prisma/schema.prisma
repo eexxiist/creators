@@ -14,6 +14,7 @@ datasource db {
 
 enum Role {
   USER
+  CREATOR
   ADMIN
 }
 
@@ -54,10 +55,10 @@ model Recipe {
   title       String
   description String
 
-  ingredients String
+  ingredients String[]
 
   imageUrl String
-  videoUrl String
+  videoUrl String?
 
   access RecipeAccess @default(FREE)
 
