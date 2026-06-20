@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -53,5 +54,14 @@ export class RecipeController {
     const userId = request.user.id;
     const role = request.user.role;
     return this.recipeService.updateRecipe(data, recipeId, userId, role);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN', 'CREATOR')
+  @Delete(':id')
+  async delete(@Param('id') recipeId: string, @Req() request: AuthRequest) {
+    const userId = request.user.id;
+    const role = request.user.role;
+    return this.recipeService.delete(recipeId, userId, role);
   }
 }

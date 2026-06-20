@@ -69,4 +69,20 @@ export class RecipeService {
     }
     throw new ForbiddenException('Нет доступа');
   }
+
+  async delete(recipeId: string, userId: string, role: string) {
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { id: recipeId },
+    });
+
+    if (!recipe) {
+      throw new NotFoundException('Такого рецепта нет');
+    }
+
+    if (role === 'ADMIN' || recipe.creatorId === userId) {
+      return this.prisma.recipe.delete({ where: { id: recipeId } });
+    }
+
+    throw new ForbiddenException('Нет доступа');
+  }
 }
