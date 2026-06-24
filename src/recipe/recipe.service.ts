@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipe } from './dto/update-recipe.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipeService {
@@ -28,16 +29,47 @@ export class RecipeService {
     return recipe;
   }
 
-  async getRecipesAll() {
+  async getRecipesAll(
+    page: number,
+    limit: number,
+    search?: string,
+    categoryId?: string,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.RecipeWhereInput = {};
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    if (search) {
+      where.title = { contains: search, mode: 'insensitive' };
+    }
+
+    console.log({ search, categoryId, where });
+
     return this.prisma.recipe.findMany({
-      include: { creator: true, category: true },
+      where,
+      skip,
+      take: limit,
+      include: {
+        creator: { select: { name: true, id: true, avatarUrl: true } },
+        category: true,
+      },
     });
   }
+
+  cmqsgs5tm0009lgrr0rjz85nv
+  cmqifzbs90000lgsysnlxh8qz
 
   async getRecipe(id: string) {
     const recipe = await this.prisma.recipe.findUnique({
       where: { id },
-      include: { creator: true, category: true },
+      include: {
+        creator: { select: { name: true, id: true, avatarUrl: true } },
+        category: true,
+      },
     });
 
     if (!recipe) {

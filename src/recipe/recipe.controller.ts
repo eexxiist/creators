@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,7 +16,7 @@ import type { AuthRequest } from 'src/auth/types/auth-request';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdateRecipe } from './dto/update-recipe.dto';
 
 @ApiBearerAuth()
@@ -33,9 +34,22 @@ export class RecipeController {
     return this.recipeService.create(data, creatorId);
   }
 
+  @ApiQuery({
+    name: 'search',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'categoryId',
+    required: false,
+  })
   @Get()
-  async getRecipeAll() {
-    return this.recipeService.getRecipesAll();
+  async getRecipeAll(
+    @Query('search') search?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 12,
+  ) {
+    return this.recipeService.getRecipesAll(page, limit, search, categoryId);
   }
 
   @Get(':id')
