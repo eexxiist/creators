@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { RecipeModule } from './recipe/recipe.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FavoriteModule } from './favorite/favorite.module';
     CategoryModule,
     RecipeModule,
     FavoriteModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
