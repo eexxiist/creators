@@ -8,6 +8,7 @@ import { CategoryModule } from './category/category.module';
 import { RecipeModule } from './recipe/recipe.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { CommentModule } from './comment/comment.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommentModule } from './comment/comment.module';
     RecipeModule,
     FavoriteModule,
     CommentModule,
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

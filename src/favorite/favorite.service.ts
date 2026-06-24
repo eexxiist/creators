@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class FavoriteService {
   constructor(private prisma: PrismaService) {}
   async addFavorite(recipeId: string, userId: string) {
+    
     const recipe = await this.prisma.recipe.findUnique({
       where: { id: recipeId },
     });
