@@ -1,0 +1,112 @@
+Only in src: .DS_Store
+diff -ru src/app.module.ts server/server-nest/src/app.module.ts
+--- src/app.module.ts	2026-06-26 16:59:35
++++ server/server-nest/src/app.module.ts	2026-06-26 15:23:57
+@@ -9,6 +9,8 @@
+ import { FavoriteModule } from './favorite/favorite.module';
+ import { CommentModule } from './comment/comment.module';
+ import { LikeModule } from './like/like.module';
++import { UsersModule } from './users/users.module';
++import { FollowModule } from './follow/follow.module';
+ 
+ @Module({
+   imports: [
+@@ -22,8 +24,10 @@
+     FavoriteModule,
+     CommentModule,
+     LikeModule,
++    UsersModule,
++    FollowModule,
+   ],
+   controllers: [AppController],
+   providers: [AppService],
+ })
+-export class AppModule {}
+\ No newline at end of file
++export class AppModule {}
+diff -ru src/auth/auth.controller.ts server/server-nest/src/auth/auth.controller.ts
+--- src/auth/auth.controller.ts	2026-06-26 16:59:35
++++ server/server-nest/src/auth/auth.controller.ts	2026-06-26 16:38:40
+@@ -11,11 +11,6 @@
+ export class AuthController {
+   constructor(private authService: AuthService) {}
+ 
+-  @Get('users')
+-  async getUsers() {
+-    return this.authService.getUsers();
+-  }
+-
+   @Post('registration')
+   async registration(@Body() data: RegistrationDto) {
+     return this.authService.registration(data);
+@@ -24,13 +19,5 @@
+   @Post('login')
+   async login(@Body() data: LoginDto) {
+     return this.authService.login(data);
+-  }
+-
+-  @ApiBearerAuth()
+-  @Get('profile')
+-  @UseGuards(AuthGuard)
+-  async profile(@Req() request: AuthRequest) {
+-    let userId = request.user.id;
+-    return this.authService.profile(userId);
+   }
+ }
+diff -ru src/auth/auth.service.ts server/server-nest/src/auth/auth.service.ts
+--- src/auth/auth.service.ts	2026-06-26 16:59:35
++++ server/server-nest/src/auth/auth.service.ts	2026-06-26 16:43:40
+@@ -69,14 +69,4 @@
+       },
+     };
+   }
+-
+-  async profile(userId: string) {
+-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+-
+-    if (!user) {
+-      throw new BadRequestException('Вы не зарегистрированы');
+-    }
+-
+-    return user;
+-  }
+ }
+Only in server/server-nest/src: follow
+diff -ru src/main.ts server/server-nest/src/main.ts
+--- src/main.ts	2026-08-05 09:40:08
++++ server/server-nest/src/main.ts	2026-08-08 13:12:01
+@@ -6,6 +6,11 @@
+ async function bootstrap() {
+   const app = await NestFactory.create(AppModule);
+ 
++  app.enableCors({
++    origin: 'http://localhost:3000',
++    credentials: true,
++  });
++
+   app.useGlobalPipes(new ValidationPipe());
+ 
+   const config = new DocumentBuilder()
+diff -ru src/recipe/recipe.service.ts server/server-nest/src/recipe/recipe.service.ts
+--- src/recipe/recipe.service.ts	2026-06-26 16:59:35
++++ server/server-nest/src/recipe/recipe.service.ts	2026-06-24 23:31:40
+@@ -47,8 +47,6 @@
+       where.title = { contains: search, mode: 'insensitive' };
+     }
+ 
+-    console.log({ search, categoryId, where });
+-
+     return this.prisma.recipe.findMany({
+       where,
+       skip,
+@@ -59,9 +57,6 @@
+       },
+     });
+   }
+-
+-  cmqsgs5tm0009lgrr0rjz85nv
+-  cmqifzbs90000lgsysnlxh8qz
+ 
+   async getRecipe(id: string) {
+     const recipe = await this.prisma.recipe.findUnique({
+Only in server/server-nest/src: users
