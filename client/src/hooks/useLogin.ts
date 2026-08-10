@@ -1,6 +1,16 @@
-import { useMutation } from "@tanstack/react-query";
-import { AuthService } from "@/services/auth.service";
+import { useMutation } from '@tanstack/react-query';
+import { AuthService } from '@/services/auth.service';
+import { ACCESS_TOKEN } from '@/constants/auth.constants';
+import { useRouter } from 'next/navigation';
 
 export const useLogin = () => {
-    return useMutation({mutationFn: AuthService.login})
-}
+  const router = useRouter();
+  return useMutation({
+    mutationFn: AuthService.login,
+    onSuccess: (data) => {
+      const token = data.token;
+      localStorage.setItem(ACCESS_TOKEN, token);
+      router.push('/');
+    },
+  });
+};

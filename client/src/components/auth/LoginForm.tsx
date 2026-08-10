@@ -9,9 +9,7 @@ export default function LoginForm() {
   const { mutate } = useLogin();
 
   const onSubmit = (data: LoginDto) => {
-    console.log('Форма отправлена', data);
     mutate(data);
-    console.log('mutate вызван');
   };
 
   return (
