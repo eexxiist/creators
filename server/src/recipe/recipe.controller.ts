@@ -1,3 +1,4 @@
+import { FollowService } from './../follow/follow.service';
 import {
   Body,
   Controller,
@@ -55,6 +56,18 @@ export class RecipeController {
   @Get(':id')
   async getRecipe(@Param('id') id: string) {
     return this.recipeService.getRecipe(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/feed')
+  async getFeedRecipes(@Req() request: AuthRequest) {
+    const userId = request.user.id;
+    return this.recipeService.getFeedRecipes(userId);
+  }
+
+  @Get('/recommended')
+  async getRecommendedRecipes() {
+    return this.recipeService.getRecommendedRecipes();
   }
 
   @UseGuards(AuthGuard, RolesGuard)

@@ -8,6 +8,21 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipe } from './dto/update-recipe.dto';
 import { Prisma } from '@prisma/client';
 
+const recipeCardSelect = {
+  title: true,
+  imageUrl: true,
+  description: true,
+  createdAt: true,
+  id: true,
+  creator: {
+    select: {
+      name: true,
+      avatarUrl: true,
+    },
+  },
+  _count: { select: { likes: true, comments: true } },
+};
+
 @Injectable()
 export class RecipeService {
   constructor(private prisma: PrismaService) {}
@@ -72,6 +87,36 @@ export class RecipeService {
     }
 
     return recipe;
+  }
+
+  async getFeedRecipes(userId: string) {
+    const follower = await this.prisma.follow.findMany({
+      where: { followerId: userId },
+    });
+    const authors = follower.map((follow) => follow.followingId);
+
+    if (!authors.length) {
+      return this.getRecommendedRecipes();
+    }
+
+    const recipes = await this.prisma.recipe.findMany({
+      where: { creatorId: { in: authors } },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: recipeCardSelect,
+    });
+
+    return recipes;
+  }
+
+  async getRecommendedRecipes() {
+    const recommended = await this.prisma.recipe.findMany({
+      orderBy: [{ likes: { _count: 'desc' } }, { createdAt: 'desc' }],
+      select: recipeCardSelect,
+    });
+
+    return recommended;
   }
 
   async updateRecipe(
