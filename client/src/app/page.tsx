@@ -1,8 +1,9 @@
 'use client';
 
-import RecipeCard from '@/components/RecipeCard';
-import { useFeedRecipes } from '@/hooks/useFeedRecipes';
-import { Recipe } from '@/types/recipe.types';
+import RecipeCard from '@/components/recipeCard/RecipeCard';
+import { useFeedRecipes } from '@/hooks/useRecipes';
+import { RecipePreview } from '@/types/recipe.types';
+import styles from '../components/recipeCard/RecipeCard.module.css';
 
 export default function Home() {
   const { data, isLoading, error } = useFeedRecipes();
@@ -16,9 +17,9 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main className={styles.main}>
       <h1>Рекомендации</h1>
-      {data?.map((recipe: Recipe) => (
+      {data?.map((recipe: RecipePreview) => (
         <RecipeCard key={recipe.id} recipe={recipe} />
       ))}
     </main>
