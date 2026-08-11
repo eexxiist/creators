@@ -6,13 +6,18 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import styles from './RecipePage.module.css';
 import { useLikeStatus, useLikes, useUnlike } from '@/hooks/useLikes';
+import CommentForm from '@/components/commentForm/CommentForm';
+import { useDeleteComment } from '@/hooks/useComment';
+import { useMe } from '@/hooks/useMe';
 
 const Page = () => {
   const { id } = useParams<{ id: string }>();
+  const { data: currentData, isLoading: isLoadingMe, error: errorMe } = useMe();
   const { data, isLoading, error } = useRecipe(id);
   const { mutate: addLike } = useLikes();
   const { mutate: removeLike } = useUnlike();
   const { data: likeStatus, isLoading: isLikeLoading } = useLikeStatus(id);
+  const { mutate: deleteComment } = useDeleteComment();
 
   if (isLoading) {
     return <p className={styles.status}>Загрузка...</p>;
@@ -128,14 +133,32 @@ const Page = () => {
 
                     <p className={styles.commentText}>{comment.content}</p>
 
-                    <time className={styles.commentDate}>
-                      {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
-                    </time>
+                    <div>
+                      <time className={styles.commentDate}>
+                        {new Date(comment.createdAt).toLocaleDateString(
+                          'ru-RU',
+                        )}
+                      </time>
+                      {currentData?.role === 'ADMIN' ||
+                      currentData?.id === comment.user.id ? (
+                        <button
+                          onClick={() =>
+                            deleteComment({
+                              commentId: comment.id,
+                              recipeId: id,
+                            })
+                          }
+                        >
+                          Удалить
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </article>
               ))}
             </div>
           )}
+          <CommentForm recipeId={id} />
         </section>
       </div>
     </main>
