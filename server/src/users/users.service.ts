@@ -41,6 +41,7 @@ export class UsersService {
         bio: true,
         instagram: true,
         telegram: true,
+        role: true,
         recipes: {
           select: {
             id: true,

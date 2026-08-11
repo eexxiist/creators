@@ -24,6 +24,13 @@ export class UsersController {
     return this.usersService.getCreators();
   }
 
+  @UseGuards(AuthGuard)
+  @Get('/me')
+  async getMe(@Req() request: AuthRequest) {
+    const userId = request.user.id;
+    return this.usersService.getUser(userId);
+  }
+
   @Get(':id')
   async getUser(@Param('id') userId: string) {
     return this.usersService.getUser(userId);

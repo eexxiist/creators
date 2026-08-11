@@ -43,9 +43,19 @@ export class LikeService {
     });
   }
 
-  async getLikes(recipeId: string) {
-    return this.prisma.like.count({
+  async getLikes(recipeId: string, userId: string) {
+    const count = await this.prisma.like.count({
       where: { recipeId },
     });
+
+    const like = await this.prisma.like.findUnique({
+      where: {
+        userId_recipeId: {
+          recipeId,
+          userId,
+        },
+      },
+    });
+    return { count, liked: !!like };
   }
 }

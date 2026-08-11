@@ -38,8 +38,13 @@ export class LikeController {
     return this.likeService.removeLike(recipeId, userId);
   }
 
+  @UseGuards(AuthGuard)
   @Get('recipe/:recipeId')
-  async getAllLikes(@Param('recipeId') recipeId: string) {
-    return this.likeService.getLikes(recipeId);
+  async getAllLikes(
+    @Param('recipeId') recipeId: string,
+    @Req() request: AuthRequest,
+  ) {
+    const userId = request.user.id;
+    return this.likeService.getLikes(recipeId, userId);
   }
 }

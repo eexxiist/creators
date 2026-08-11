@@ -46,7 +46,7 @@ export class CommentService {
         id: true,
         content: true,
         createdAt: true,
-        user: { select: { name: true } },
+        user: { select: { id: true, name: true } },
       },
     });
   }

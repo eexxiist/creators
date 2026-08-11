@@ -79,6 +79,18 @@ export class RecipeService {
       include: {
         creator: { select: { name: true, id: true, avatarUrl: true } },
         category: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+        _count: { select: { likes: true, comments: true } },
       },
     });
 

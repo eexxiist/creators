@@ -1,4 +1,3 @@
-import { FollowService } from './../follow/follow.service';
 import {
   Body,
   Controller,
@@ -22,18 +21,9 @@ import { UpdateRecipe } from './dto/update-recipe.dto';
 
 @ApiBearerAuth()
 @ApiTags('Recipe')
-@Controller('recipe')
+@Controller('recipes')
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('ADMIN', 'CREATOR')
-  @Post()
-  async create(@Body() data: CreateRecipeDto, @Req() request: AuthRequest) {
-    const creatorId = request.user.id;
-
-    return this.recipeService.create(data, creatorId);
-  }
 
   @ApiQuery({
     name: 'search',
@@ -43,21 +33,6 @@ export class RecipeController {
     name: 'categoryId',
     required: false,
   })
-  @Get()
-  async getRecipeAll(
-    @Query('search') search?: string,
-    @Query('categoryId') categoryId?: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 12,
-  ) {
-    return this.recipeService.getRecipesAll(page, limit, search, categoryId);
-  }
-
-  @Get(':id')
-  async getRecipe(@Param('id') id: string) {
-    return this.recipeService.getRecipe(id);
-  }
-
   @UseGuards(AuthGuard)
   @Get('/feed')
   async getFeedRecipes(@Req() request: AuthRequest) {
@@ -68,6 +43,29 @@ export class RecipeController {
   @Get('/recommended')
   async getRecommendedRecipes() {
     return this.recipeService.getRecommendedRecipes();
+  }
+
+  @Get()
+  async getRecipeAll(
+    @Query('search') search?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 12,
+  ) {
+    return this.recipeService.getRecipesAll(page, limit, search, categoryId);
+  }
+  @Get(':id')
+  async getRecipe(@Param('id') id: string) {
+    return this.recipeService.getRecipe(id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN', 'CREATOR')
+  @Post()
+  async create(@Body() data: CreateRecipeDto, @Req() request: AuthRequest) {
+    const creatorId = request.user.id;
+
+    return this.recipeService.create(data, creatorId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
