@@ -5,10 +5,14 @@ import { Recipe } from '@/types/recipe.types';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import styles from './RecipePage.module.css';
+import { useLikeStatus, useLikes, useUnlike } from '@/hooks/useLikes';
 
 const Page = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useRecipe(id);
+  const { mutate: addLike } = useLikes();
+  const { mutate: removeLike } = useUnlike();
+  const { data: likeStatus, isLoading: isLikeLoading } = useLikeStatus(id);
 
   if (isLoading) {
     return <p className={styles.status}>Загрузка...</p>;
@@ -67,7 +71,14 @@ const Page = () => {
           <p className={styles.description}>{description}</p>
 
           <div className={styles.stats}>
-            <span>❤️ {_count.likes}</span>
+            <button
+              onClick={() => {
+                likeStatus?.liked ? removeLike(id) : addLike(id);
+              }}
+            >
+              {likeStatus?.liked ? '❤️' : '🤍'}
+              {likeStatus?.count}
+            </button>
             <span>💬 {_count.comments}</span>
           </div>
         </section>
